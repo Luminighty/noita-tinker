@@ -1,0 +1,22 @@
+{
+  "name": "noita-tinker",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Luminighty/noita-tinker.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Luminighty/noita-tinker/issues"
+  },
+  "homepage": "https://github.com/Luminighty/noita-tinker#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
