@@ -7,4 +7,6 @@ const app = express();
 
 app.use(express.static(path.join(__dirname, "public_html")));
 
+app.use("/", (req, res) => "Hello");
+
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
