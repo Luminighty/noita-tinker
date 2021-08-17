@@ -54,7 +54,7 @@ class SpellElement extends HTMLElement {
 		width: 50px;
 		grid-column: 1;
 		grid-row: 1;
-		padding-left: 6px;
+		padding-left: 5px;
 		padding-top: 5px;
 		z-index: 2;
 	}
