@@ -1,0 +1,13 @@
+@font-face {
+    font-family: 'noita';
+    src: url(https://vignette.wikia.nocookie.net/pcj/images/a/a4/NoitaPixel.ttf) format('truetype')
+}
+
+
+html {
+	background-color: #0d0c0c;
+}
+
+img {
+	image-rendering: pixelated;
+}
