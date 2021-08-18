@@ -21,6 +21,9 @@ img {
 
 * {
 	font-family: 'noita';
+}
+
+*:not(option,select) {
 	color: white;
 }
 
