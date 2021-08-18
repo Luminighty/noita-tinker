@@ -1,3 +1,5 @@
+let wand = null;
+
 class WandElement extends HTMLElement {
 
 	static styles = `
@@ -7,7 +9,6 @@ class WandElement extends HTMLElement {
 			display: inline-block;
 		}
 		.wand {
-			min-height: 75px;
 			image-rendering: pixelated;
 			margin-bottom: 10px;
 		}
@@ -18,36 +19,60 @@ class WandElement extends HTMLElement {
 
 	constructor() {
 		super();
+		wand = this;
 		this.attachShadow({mode: 'open'});
 		const wrapper = document.createElement('div');
 		wrapper.classList.add("wrapper");
 
 		this.iconElement = wrapper.appendChild(document.createElement("img"));
 		this.iconElement.classList.add("wand");
+		this.iconElement.addEventListener("dblclick", () => wandSpritePicker.open(this));
 		this.icon = randomValue(randomValue(wandSprites));
 		
-		const datas = wrapper.appendChild(document.createElement("div"));
+		this.datas = wrapper.appendChild(document.createElement("div"));
+		this.inputs = wrapper.appendChild(document.createElement("div"));
 		this.spellContainer = wrapper.appendChild(document.createElement("div"));
 		this.spellContainer.classList.add("spells");
 		
 
 		this._base = BaseStats();
 		this.data = {
-			shuffle:    Data("imgs/icons/shuffle.png", "Shuffle", true, datas, "", (value) => (value) ? "Yes" : "No", (value) => value == "True"),
-			cast:       Data("imgs/icons/casts.png", "Spells/Cast", 1, datas),
-			delay:      Data("imgs/icons/delay.png", "Cast delay", 2.20123, datas, "s", (value) => parseFloat(value).toFixed(2)),
-			recharge:   Data("imgs/icons/recharge.png", "Rechrg. Time", 0.4322, datas, "s", (value) => parseFloat(value).toFixed(2)),
-			maxmana:    Data("imgs/icons/mana.png", "Mana max", 73, datas),
-			manacharge: Data("imgs/icons/manacharge.png", "Mana chg. Spd", 230, datas),
-			capacity:   Data("imgs/icons/capacity.png", "Capacity", 3, datas),
-			spread:     Data("imgs/icons/spread.png", "Spread", 2.121, datas, "DEG", (value) => parseFloat(value).toFixed(1)),
+			shuffle:    Data("imgs/icons/shuffle.png",          "Shuffle", true, this.datas, "", (value) => (value) ? "Yes" : "No", (value) => value == "True"),
+			cast:       Data("imgs/icons/casts.png",        "Spells/Cast", 1, this.datas),
+			delay:      Data("imgs/icons/delay.png",         "Cast delay", 0, this.datas, "s", (value) => parseFloat(value).toFixed(2)),
+			recharge:   Data("imgs/icons/recharge.png",    "Rechrg. Time", 0, this.datas, "s", (value) => parseFloat(value).toFixed(2)),
+			maxmana:    Data("imgs/icons/mana.png",            "Mana max", 7, this.datas),
+			manacharge: Data("imgs/icons/manacharge.png", "Mana chg. Spd", 2, this.datas),
+			capacity:   Data("imgs/icons/capacity.png",        "Capacity", 3, this.datas),
+			spread:     Data("imgs/icons/spread.png",            "Spread", 2, this.datas, "DEG", (value) => parseFloat(value).toFixed(1)),
 		};
 
+		this.inputFields = {
+			shuffle:   InputContainer.boolean(this.inputs, this.data.shuffle.container, this.base.shuffle, ["Yes", "No"]),
+			cast:       InputContainer.number(this.inputs, this.data.cast.container,       this.base.cast, null, 1, 1, 99),
+			delay:      InputContainer.number(this.inputs, this.data.delay.container,      this.base.delay, "s", 0.01, -999, 999),
+			recharge:   InputContainer.number(this.inputs, this.data.recharge.container,   this.base.recharge, "s", 0.01, -999, 999),
+			maxmana:    InputContainer.number(this.inputs, this.data.maxmana.container,    this.base.maxmana, null, 1, 0, 99999),
+			manacharge: InputContainer.number(this.inputs, this.data.manacharge.container, this.base.manacharge, null, 1, 0, 99999),
+			capacity:   InputContainer.number(this.inputs, this.data.capacity.container,   this.base.capacity, null, 1, 1, 99),
+			spread:     InputContainer.number(this.inputs, this.data.spread.container,     this.base.spread, "DEG", 0.01, 1, 99),
+		};
+		for (const key in this.inputFields) {
+			const inputField = this.inputFields[key];
+			inputField.onValueChanged((value) => {
+				this.base[key] = value;
+				this.calculate();
+			});
+		}
+
 		this.spells = [];
+		this.updateCapacity(this.base.capacity);
+		this.isEditingStats = false;
 
 
 		const style = document.createElement('style');
 		style.textContent = WandElement.styles;
+		
 		this.calculate();
 		// attach the created elements to the shadow DOM
 		this.shadowRoot.append(style, wrapper);
@@ -56,6 +81,11 @@ class WandElement extends HTMLElement {
 	set icon(value) {
 		this._icon = value;
 		this.iconElement.src = `imgs/wands/wand_${value.toString().padStart(4, '0')}.png`;
+		if (this.iconElement.naturalHeight == 0) {
+			this.iconElement.addEventListener("load", () => this.iconElement.height = this.iconElement.naturalHeight * 5);
+		} else {
+			this.iconElement.height = this.iconElement.naturalHeight * 5;
+		}
 	}
 
 	get icon() {return this._icon;}
@@ -71,7 +101,7 @@ class WandElement extends HTMLElement {
 	}
 
 	calculate() {
-		let stats = this.base;
+		let stats = Object.assign({}, this.base);
 		for (const spellElement of this.spells)
 			stats = applySpell(stats, spellElement.spell);
 		
@@ -90,27 +120,33 @@ class WandElement extends HTMLElement {
 		while(this.spells.length < newCapacity) 
 			this.spells.push(this.spellContainer.appendChild(document.createElement("spell-element")));
 	}
+
+	set isEditingStats(value) {
+		this.datas.style.display = (value) ? "none" : "block";
+		this.inputs.style.display = (value) ? "block" : "none";
+	}
 }
 
 function BaseStats() {
 	return {
 		shuffle: Math.random() > 0.5, 
 		cast: parseInt(Math.max(Math.random() * 8 - 3, 1)), 
-		delay: Math.random() * 2,
-		recharge: Math.random() * 3, 
+		delay: (Math.random() * 2).toFixed(2),
+		recharge: (Math.random() * 3).toFixed(2), 
 		maxmana: parseInt(Math.random() * 500), 
 		manacharge: parseInt(Math.random() * 500),
 		capacity: parseInt(Math.random() * 25 + 1), 
-		spread: Math.max(Math.random() * 15 - 5, 0)
+		spread: (Math.max(Math.random() * 15 - 5, 0)).toFixed(2)
 	};
 }
 
 
 
 function applySpell(stats, spell) {
-	stats.spread += spell["spread_degrees"];
-	stats.spread += spell["spread_degrees"];
-	stats.delay += spell["fire_rate_wait"] / 60;
+	if (spell) {
+		stats.spread = parseFloat(stats.spread) + parseFloat(spell["spread_degrees"]);
+		stats.delay = parseFloat(stats.delay) + parseFloat(spell["fire_rate_wait"] / 60);
+	}
 	return stats;
 }
 
@@ -128,7 +164,22 @@ function Data(icon, label, value, parent, postfix, setter = (value) => value, ge
 	};
 }
 
-WandElement.html = `
-`;
-
 customElements.define('wand-element', WandElement);
+
+let settings = {
+	set editingBaseStats(value) {
+		this._.editingBaseStats = value;
+		document.querySelectorAll("wand-element").forEach((element) => {
+			element.isEditingStats = value;
+		});
+	},
+	get editingBaseStats() { return this._.editingBaseStats; },
+
+	_: {
+		editingBaseStats: false,
+	}
+}
+
+document.querySelector("#editStats").addEventListener("change", (event) => {
+	settings.editingBaseStats = event.target.checked;
+});

@@ -51,6 +51,7 @@ class DataContainer extends HTMLElement {
 		this.value = this.getAttribute('data-value') || "";
 		this.postfix = this.getAttribute("data-postfix") || "";
 
+
 		const style = document.createElement('style');
 		style.textContent = DataContainer.styles;
 
@@ -86,5 +87,8 @@ class DataContainer extends HTMLElement {
 		}
 	}
 
+	get icon() {
+		return this.iconElement.src;
+	}
 }
 customElements.define('data-container', DataContainer);

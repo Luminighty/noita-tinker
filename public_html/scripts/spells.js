@@ -105,8 +105,8 @@ class SpellElement extends HTMLElement {
 		this.spellElement.src = spell.sprite;
 		this.spellBox.src = `imgs/inventory/item_bg_${SpellType.fromValue(spell.type).file}.png`;
 		
-		this.spellElement.style.visibility = "shown";
-		this.spellBox.style.visibility = "shown";
+		this.spellElement.style.visibility = "visible";
+		this.spellBox.style.visibility = "visible";
 	}
 }
 

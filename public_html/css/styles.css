@@ -11,3 +11,19 @@ html {
 img {
 	image-rendering: pixelated;
 }
+
+.wand-sprite {
+    image-rendering: pixelated;
+    margin-bottom: 10px;
+	z-index: 100;
+    vertical-align: middle;
+}
+
+* {
+	font-family: 'noita';
+	color: white;
+}
+
+label {
+	user-select: none;
+}
