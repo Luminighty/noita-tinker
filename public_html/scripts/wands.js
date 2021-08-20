@@ -7,6 +7,8 @@ class WandElement extends HTMLElement {
 			border: 3px solid #948064;
 			padding: 15px;
 			display: inline-block;
+			border-radius: 2px;
+			margin-bottom: 10px;
 		}
 		.wand {
 			image-rendering: pixelated;
@@ -95,8 +97,10 @@ class WandElement extends HTMLElement {
 	}
 
 	set base(value) {
-		for (const key in value) 
+		for (const key in value) {
 			this._base[key] = value[key];
+			this.inputFields[key].value = value[key];
+		}
 		this.calculate();
 	}
 
@@ -183,3 +187,38 @@ let settings = {
 document.querySelector("#editStats").addEventListener("change", (event) => {
 	settings.editingBaseStats = event.target.checked;
 });
+
+function save() {
+	const data = {
+		wands: []
+	};
+	const wands = document.querySelectorAll("wand-element");
+	for (const wand of wands) {
+		const wandData = {
+			sprite: wand.icon,
+			base: wand.base,
+			spells: wand.spells.map((spell) => (spell.spell) ? spell.spell.id : null)
+		};
+		data.wands.push(wandData);
+	}
+	return JSON.stringify(data);
+}
+
+
+function load(str) {
+	const data = JSON.parse(str);
+	const wandContainer = document.querySelector("#wands.container");
+	while(wandContainer.children.length > 0)
+		wandContainer.removeChild(wandContainer.firstChild);
+	for (const wand of data.wands) {
+		const element = wandContainer.appendChild(document.createElement("wand-element"));
+		element.icon = wand.sprite;
+		element.base = wand.base;
+		element.updateCapacity(wand.base.capacity);
+		for (let index = 0; index < wand.spells.length; index++) {
+			const spellId = wand.spells[index];
+			element.spells[index].spell = spellId;
+		}
+		element.calculate();
+	}
+}

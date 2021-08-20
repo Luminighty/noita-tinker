@@ -7,19 +7,21 @@
 	<link rel="stylesheet" href="css/styles.css">
 	<link rel="stylesheet" href="css/modal.css">
 	<link rel="icon" type="image/png" href="favicon.png"/>
-	<title>Noita Tinker With Wands</title>
+	<title>Noita Tinker With Wands Online</title>
 </head>
 <body>
-	<div>
-		<input type="checkbox" name="editStats" id="editStats">
-		<label for="editStats">Edit Base stats</label>
-	</div>
 	<div id="wands" class="container">
+		<div>
+			<input type="checkbox" name="editStats" id="editStats">
+			<label for="editStats">Edit Base stats</label>
+		</div>
+		<wand-element ></wand-element>
+		<wand-element ></wand-element>
+		<wand-element ></wand-element>
 		<wand-element ></wand-element>
 	</div>
-	<div>
-		<!--spell-element></spell-element-->
-	</div>
+	<spell-picker></spell-picker>
+	
 
 	<div id="wand-sprite-modal" class="modal">
 		<div class="modal-content">
@@ -28,7 +30,6 @@
 				<option value="Any">Any</option>
 			</select>
 			<div class="wands">
-
 			</div>
 		</div>
 	</div>
@@ -40,4 +41,5 @@
 <script src="scripts/input-container.js"></script>
 <script src="scripts/spells.js"></script>
 <script src="scripts/wands.js"></script>
+<script src="scripts/spell-picker.js"></script>
 </html>

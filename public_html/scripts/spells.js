@@ -41,6 +41,9 @@ class SpellElement extends HTMLElement {
 		width: 60px;
 		grid-column: 1;
 		grid-row: 1;
+		user-select: none;
+		user-drag: none;
+		-webkit-user-drag: none;
 	}
 	.spell-box {
 		width: 75px;
@@ -49,8 +52,14 @@ class SpellElement extends HTMLElement {
 		grid-column: 1;
 		z-index: 1;
 		margin: -7.6px;
+		user-select: none;
+		user-drag: none;
+		-webkit-user-drag: none;
 	}
 	.spell {
+		user-select: none;
+		user-drag: none;
+		-webkit-user-drag: none;
 		width: 50px;
 		grid-column: 1;
 		grid-row: 1;
