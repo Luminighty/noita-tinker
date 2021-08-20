@@ -81,6 +81,7 @@ class SpellElement extends HTMLElement {
 		this.spellSlot = wrapper.appendChild(document.createElement("img"));
 		this.spellBox = wrapper.appendChild(document.createElement("img"));
 		this.spellElement = wrapper.appendChild(document.createElement("img"));
+		this.loading = "lazy";
 
 		this.spellSlot.classList.add("spell-slot");
 		this.spellSlot.src = "imgs/inventory/inventory_box.png";
