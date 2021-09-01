@@ -58,6 +58,9 @@ class SpellPicker extends HTMLElement {
 		this.spellElements = Object.keys(spells).sort((a,b) => spells[a].type - spells[b].type).map(((key) => {
 			const element = spellHolder.appendChild(document.createElement("spell-element"));
 			element.spell = key;
+			element.addEventListener("mousedown", (e) => {
+				GrabbedSpell.grabbed = key;
+			});
 			return element;
 		}));
 

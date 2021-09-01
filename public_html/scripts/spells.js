@@ -1,3 +1,25 @@
+const GrabbedSpell = {
+	grabbed: null,
+	originalHover: null,
+	hover: null,
+	hoverWand: null,
+	get is_grabbing() { return this.grabbed != null; },
+	get is_hovering() { return this.hover != null; },
+}
+
+document.body.addEventListener("mouseup", () => {
+	if (GrabbedSpell.hover && GrabbedSpell.grabbed) {
+		if (GrabbedSpell.hover.spell && GrabbedSpell.originalHover)
+			GrabbedSpell.originalHover.spell = GrabbedSpell.hover.spell.id;
+		GrabbedSpell.hover.spell = GrabbedSpell.grabbed;
+	}
+	if (GrabbedSpell.hoverWand)
+		GrabbedSpell.hoverWand.calculate();
+	GrabbedSpell.grabbed = null;
+	GrabbedSpell.originalHover = null;
+});
+
+
 
 const SpellType = {
 	ACTION_TYPE_PROJECTILE:        SpellTypeApply(0, "projectile"),
@@ -93,6 +115,7 @@ class SpellElement extends HTMLElement {
 
 		const style = document.createElement('style');
 		style.textContent = SpellElement.styles;
+
 		this.shadowRoot.append(style, wrapper);
 	}
 
@@ -118,6 +141,7 @@ class SpellElement extends HTMLElement {
 		this.spellElement.style.visibility = "visible";
 		this.spellBox.style.visibility = "visible";
 	}
+
 }
 
 customElements.define('spell-element', SpellElement);

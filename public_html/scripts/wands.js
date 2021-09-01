@@ -121,8 +121,24 @@ class WandElement extends HTMLElement {
 	updateCapacity(newCapacity) {
 		while(this.spells.length > newCapacity)
 			this.spellContainer.removeChild(this.spells.pop());
-		while(this.spells.length < newCapacity) 
-			this.spells.push(this.spellContainer.appendChild(document.createElement("spell-element")));
+		while(this.spells.length < newCapacity) {
+			const spellElement = this.spellContainer.appendChild(document.createElement("spell-element"));
+			spellElement.addEventListener("mousedown", (e) => {
+				GrabbedSpell.grabbed = (spellElement.spell) ? spellElement.spell.id : null;
+				GrabbedSpell.originalHover = spellElement;
+				spellElement.spell = null;
+				this.calculate();
+			});
+			spellElement.addEventListener("mouseover", (e) => {
+				GrabbedSpell.hover = spellElement;
+				GrabbedSpell.hoverWand = this;
+			});
+			spellElement.addEventListener("mouseout", (e) => {
+				if (GrabbedSpell.hover == spellElement)
+					GrabbedSpell.hover = null;
+			});
+			this.spells.push(spellElement);
+		}
 	}
 
 	set isEditingStats(value) {
