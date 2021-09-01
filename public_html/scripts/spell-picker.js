@@ -14,6 +14,7 @@ class SpellPicker extends HTMLElement {
 		flex-flow: wrap;
 		overflow-y: auto;
 		overflow-x: hidden;
+		align-content: flex-start;
 	}
 	.input {		
 		font-family: 'noita';
@@ -59,7 +60,10 @@ class SpellPicker extends HTMLElement {
 			const element = spellHolder.appendChild(document.createElement("spell-element"));
 			element.spell = key;
 			element.addEventListener("mousedown", (e) => {
-				GrabbedSpell.grabbed = key;
+				if (e.button != 0)
+					return;
+				GrabbedSpell.grab(key, e, {x: 0, y: e.target.getBoundingClientRect().height * 3 / 4});
+				GrabbedSpell.originalHover = null;
 			});
 			return element;
 		}));
@@ -85,7 +89,7 @@ class SpellPicker extends HTMLElement {
 		label.innerText = title;
 		const filter = parent.appendChild(document.createElement(type != "select" ? "input" : "select"));
 		filter.classList.add("input");
-		filter.addEventListener("change", onChange);
+		filter.addEventListener("keyup", onChange);
 		if (type == "select")
 		for (const value of values) {
 			let key = value;

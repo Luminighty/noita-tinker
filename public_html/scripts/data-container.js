@@ -27,7 +27,7 @@ class DataContainer extends HTMLElement {
 		color: #cfcfce;
 	}
 	.value {
-		width: 120px;
+		width: 150px;
 		color: #ffffff;
 	}
 	`

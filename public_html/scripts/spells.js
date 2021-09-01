@@ -1,23 +1,3 @@
-const GrabbedSpell = {
-	grabbed: null,
-	originalHover: null,
-	hover: null,
-	hoverWand: null,
-	get is_grabbing() { return this.grabbed != null; },
-	get is_hovering() { return this.hover != null; },
-}
-
-document.body.addEventListener("mouseup", () => {
-	if (GrabbedSpell.hover && GrabbedSpell.grabbed) {
-		if (GrabbedSpell.hover.spell && GrabbedSpell.originalHover)
-			GrabbedSpell.originalHover.spell = GrabbedSpell.hover.spell.id;
-		GrabbedSpell.hover.spell = GrabbedSpell.grabbed;
-	}
-	if (GrabbedSpell.hoverWand)
-		GrabbedSpell.hoverWand.calculate();
-	GrabbedSpell.grabbed = null;
-	GrabbedSpell.originalHover = null;
-});
 
 
 
@@ -142,7 +122,82 @@ class SpellElement extends HTMLElement {
 		this.spellBox.style.visibility = "visible";
 	}
 
+	show() {
+		this.spellSlot.style.visibility = "visible";
+		this.spellElement.style.visibility = (this.spell) ? "visible" : "hidden";
+		this.spellBox.style.visibility = "visible";
+	}
+
+	hide() {
+		this.spellSlot.style.visibility = "hidden";
+		this.spellElement.style.visibility = "hidden";
+		this.spellBox.style.visibility = "hidden";
+	}
+
 }
 
 customElements.define('spell-element', SpellElement);
 
+
+
+const GrabbedSpell = {
+	offset: {x: 0, y: 0},
+	grab(spell, e, additionalOffset = {x:0, y:0}) {
+		this._.grabbed = spell;
+		if (spell) {
+			this._.grabElement.spell = spell;
+			this.updateOffset(e, additionalOffset);
+			this.updatePosition(e.clientX, e.clientY);
+			this._.grabElement.show();
+		} else {
+			this._.grabElement.hide();
+		}
+	},
+	get grabbed() {
+		return this._.grabbed;
+	},
+	originalHover: null,
+	hover: null,
+	hoverWand: null,
+	get is_grabbing() { return this.grabbed != null; },
+	get is_hovering() { return this.hover != null; },
+
+	updatePosition(x, y) {
+		if (!this.grabbed)
+			return;
+		const grabElement = GrabbedSpell._.grabElement;
+		grabElement.style.left = `${x + GrabbedSpell.offset.x}px`;
+		grabElement.style.top = `${y + GrabbedSpell.offset.y - 50}px`;
+	},
+
+	updateOffset(e, additionalOffset = {x:0, y:0}) {
+		const {x, y} = e.target.getBoundingClientRect();
+		this.offset = {x: x - e.clientX + additionalOffset.x, y: y - e.clientY + additionalOffset.y};
+	},
+
+	/**
+	 * @private
+	 */
+	_: {
+		grabbed: null,
+		grabElement: document.body.appendChild(document.createElement("spell-element")),
+	},
+};
+
+GrabbedSpell._.grabElement.id = "grab-element";
+
+document.body.addEventListener("mousemove", (e) => GrabbedSpell.updatePosition(e.clientX, e.clientY));
+
+document.body.addEventListener("mouseup", (e) => {
+	if (GrabbedSpell.hover && GrabbedSpell.grabbed) {
+		if (GrabbedSpell.hover.spell && GrabbedSpell.originalHover)
+			GrabbedSpell.originalHover.spell = GrabbedSpell.hover.spell.id;
+		GrabbedSpell.hover.spell = GrabbedSpell.grabbed;
+		GrabbedSpell.hover.style.filter = "brightness(1)";
+	}
+	if (GrabbedSpell.hoverWand)
+		GrabbedSpell.hoverWand.calculate();
+	GrabbedSpell.grab(null, e);
+	GrabbedSpell.originalHover = null;
+	GrabbedSpell.hover = null;
+});

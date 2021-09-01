@@ -3,6 +3,10 @@
     src: url(https://vignette.wikia.nocookie.net/pcj/images/a/a4/NoitaPixel.ttf) format('truetype')
 }
 
+:root {
+	--grab-brightness: 1.0;
+}
+
 
 html {
 	background-color: #0d0c0c;
@@ -69,4 +73,19 @@ label {
 
 wand-element {
     display: block;
+}
+
+#grab-element {
+	visibility: hidden;
+	position: fixed;
+    pointer-events: none;
+	z-index: 20;
+}
+
+#grab-element.shown {
+	visibility: visible;
+}
+
+spell-element:hover {
+	filter: brightness(var(--grab-brightness));
 }
